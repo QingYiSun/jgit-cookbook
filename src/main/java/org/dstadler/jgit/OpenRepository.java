@@ -22,6 +22,8 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
 import java.io.File;
@@ -46,6 +48,9 @@ public class OpenRepository {
                 .build()) {
             System.out.println("Having repository: " + repository.getDirectory());
 
+           // RevWalk walk = new RevWalk(repository);
+           // RevCommit commit = walk.parseCommit(1);
+
             // the Ref holds an ObjectId for any type of object (tree, commit, blob, tree)
             Ref head = repository.exactRef("refs/heads/master");
             System.out.println("Ref of refs/heads/master: " + head);
@@ -55,7 +60,7 @@ public class OpenRepository {
         FileUtils.deleteDirectory(repoDir.getParentFile());
     }
 
-    private static File createSampleGitRepo() throws IOException, GitAPIException {
+    static File createSampleGitRepo() throws IOException, GitAPIException {
         try (Repository repository = CookbookHelper.createNewRepository()) {
             System.out.println("Temporary repository at " + repository.getDirectory());
 
