@@ -24,7 +24,7 @@ public class MyFindDiff {
 
     public static void main(String[] args) throws IOException, GitAPIException {
         File localPath = new File("/Users/abnerallen/jgit-cookbook/src/test/jpa");
-        localPath.createNewFile();
+   /*     localPath.createNewFile();
 
         System.out.println("Cloning from " + REMOTE_URL + " to " + localPath);
         try(Git result = Git.cloneRepository()
@@ -56,8 +56,8 @@ public class MyFindDiff {
                     "e8c5666070fc195dc6e9431a92013bff2ff926a0",
                     "85e588d7d033e4f9b818e4557e717f8102edc5c0"
             );
-        }
-        //FileUtils.deleteDirectory(localPath);
+        }*/
+        FileUtils.deleteDirectory(localPath);
     }
 
     private static class SimpleProgressMonitor implements ProgressMonitor {
