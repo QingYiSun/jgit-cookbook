@@ -18,8 +18,8 @@ public class GetCommits {
 
     public static void main(String[] args) throws IOException, GitAPIException{
 
-        File localPath = new File("/Users/abnerallen/jgit-cookbook/src/test/redis");
-        localPath.createNewFile();
+        File localPath = new File("/Users/abnerallen/IdeaProjects/SunGit/jgit-cookbook/src/test/redis");
+/*        localPath.createNewFile();
 
         System.out.println("Cloning from " + REMOTE_URL + " to " + localPath);
 
@@ -49,8 +49,8 @@ public class GetCommits {
             }
 
         }
-
-        //FileUtils.deleteDirectory(localPath);
+*/
+        FileUtils.deleteDirectory(localPath);
 
     }
 

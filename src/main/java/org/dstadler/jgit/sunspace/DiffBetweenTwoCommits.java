@@ -21,7 +21,7 @@ public class DiffBetweenTwoCommits {
 
     public static void main(String[] args) throws IOException, GitAPIException{
 
-        File localPath = new File("/Users/abnerallen/jgit-cookbook/src/test/redis");
+        File localPath = new File("/Users/abnerallen/IdeaProjects/SunGit/jgit-cookbook/src/test/redis");
         localPath.createNewFile();
 
         System.out.println("Cloning from " + REMOTE_URL + " to " + localPath);
