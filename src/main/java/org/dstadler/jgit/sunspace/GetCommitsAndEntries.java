@@ -72,8 +72,6 @@ public class GetCommitsAndEntries {
 
             }
 
-            System.out.println(allCommitIDs.get(counter - 1).getName());
-
             ObjectReader reader = git.getRepository().newObjectReader();
 
             CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
