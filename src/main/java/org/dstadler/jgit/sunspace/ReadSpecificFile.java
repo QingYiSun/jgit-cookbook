@@ -37,36 +37,36 @@ public class ReadSpecificFile {
         localPath.createNewFile();
 
         // clone remote repository to local
-        try(Repository repository = CookbookHelper.openJGitCookbookRepository()
+        try(Git git = Git.cloneRepository()
+            .setURI(REMOTE_URL)
+            .setDirectory(localPath)
+            .call()
         ){
+            /* to check lastCommitId whether is the last commit id */
 
-            ObjectId lastCommitId = repository.resolve(Constants.HEAD);
+            // resolve the lastCommitId
+            ObjectId lastCommitId = git.getRepository().resolve(Constants.HEAD);
+            System.out.println("ID resolved: " + lastCommitId.getName());
 
-            // a RevWalk allows to walk over commits based on some filtering that is defined
-            try(RevWalk revWalk = new RevWalk(repository)){
-
-                RevCommit commit = revWalk.parseCommit(lastCommitId);
-                RevTree tree = commit.getTree(); // use commits' tree to find the path
-                System.out.println("Having tree: " + tree);
-
-                try(TreeWalk treeWalk = new TreeWalk(repository)){
-
-                    treeWalk.addTree(tree);
-                    treeWalk.setRecursive(true);
-                    treeWalk.setFilter(PathFilter.create("README.md"));
-                    if(!treeWalk.next()){
-                        throw new IllegalStateException("Did not find expected file 'README.md'");
-                    }
-
-                    ObjectId objectId = treeWalk.getObjectId(0);
-                    ObjectLoader loader = repository.open(objectId);
-
-                    loader.copyTo(System.out);
-
+            // get the id of the last commit
+            Collection<Ref> allRefs = git.getRepository().getAllRefs().values();
+            int counter = 0;
+            ArrayList<ObjectId> allCommitIDs = new ArrayList<>();
+            try(RevWalk revWalk = new RevWalk(git.getRepository())){
+                for(Ref ref: allRefs){
+                    revWalk.markStart(revWalk.parseCommit(ref.getObjectId()));
                 }
-
+                for(RevCommit commit: revWalk){
+                    allCommitIDs.add(commit.getId());
+                    counter++;
+                }
             }
-
+            System.out.println("Last 3: " + allCommitIDs.get(counter - 3).getName());
+            System.out.println("Last 2: " + allCommitIDs.get(counter - 2).getName());
+            System.out.println("Last 1: " + allCommitIDs.get(counter - 1).getName());
+            System.out.println("First 1: " + allCommitIDs.get(0).getName());
+            System.out.println("First 2: " + allCommitIDs.get(1).getName());
+            System.out.println("First 3: " + allCommitIDs.get(2).getName());
         }
 
         FileUtils.deleteDirectory(localPath);
