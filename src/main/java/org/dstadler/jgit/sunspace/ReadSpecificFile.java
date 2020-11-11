@@ -42,7 +42,6 @@ public class ReadSpecificFile {
             .setDirectory(localPath)
             .call()
         ){
-            /* to check lastCommitId whether is the last commit id */
 
             // resolve the lastCommitId
             ObjectId lastCommitId = git.getRepository().resolve(Constants.HEAD);
@@ -61,12 +60,26 @@ public class ReadSpecificFile {
                     counter++;
                 }
             }
-            System.out.println("Last 3: " + allCommitIDs.get(counter - 3).getName());
-            System.out.println("Last 2: " + allCommitIDs.get(counter - 2).getName());
-            System.out.println("Last 1: " + allCommitIDs.get(counter - 1).getName());
-            System.out.println("First 1: " + allCommitIDs.get(0).getName());
-            System.out.println("First 2: " + allCommitIDs.get(1).getName());
-            System.out.println("First 3: " + allCommitIDs.get(2).getName());
+
+            ObjectReader reader = git.getRepository().newObjectReader();
+
+            CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
+            ObjectId oldTree = git.getRepository().resolve(allCommitIDs.get(counter - 1100).getName() + "^{tree}");
+            oldTreeIter.reset(reader, oldTree);
+            System.out.println(allCommitIDs.get(counter - 1100).getName());
+
+            CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
+            ObjectId newTree = git.getRepository().resolve(allCommitIDs.get(counter - 1101).getName() + "^{tree}");
+            newTreeIter.reset(reader, newTree);
+            System.out.println(allCommitIDs.get(counter - 1101).getName());
+
+            DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
+            diffFormatter.setRepository(git.getRepository());
+            List<DiffEntry> entries = diffFormatter.scan(oldTreeIter, newTreeIter);
+
+            for(DiffEntry entry: entries){
+                System.out.println(entry.getChangeType() + "  " + entry.getOldPath() + "  " + entry.getNewPath());
+            }
         }
 
         FileUtils.deleteDirectory(localPath);
