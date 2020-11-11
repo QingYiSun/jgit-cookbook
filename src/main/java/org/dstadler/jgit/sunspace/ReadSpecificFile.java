@@ -49,13 +49,19 @@ public class ReadSpecificFile {
 
             // get the id of the last commit
             Collection<Ref> allRefs = git.getRepository().getAllRefs().values();
-            int counter = 0;
+            int counter = 0, goal_index = 0;
             ArrayList<ObjectId> allCommitIDs = new ArrayList<>();
             try(RevWalk revWalk = new RevWalk(git.getRepository())){
                 for(Ref ref: allRefs){
                     revWalk.markStart(revWalk.parseCommit(ref.getObjectId()));
                 }
                 for(RevCommit commit: revWalk){
+                    if(lastCommitId == commit.getId()){
+                        goal_index = counter;
+                        System.out.println("Target Index: " + goal_index);
+                        System.out.println("The first id: " + allCommitIDs.get(0).getName() + "  Expected outcome: " + lastCommitId.getName());
+                    }
+                    System.out.println("Fuck!");
                     allCommitIDs.add(commit.getId());
                     counter++;
                 }
@@ -80,6 +86,9 @@ public class ReadSpecificFile {
             for(DiffEntry entry: entries){
                 System.out.println(entry.getChangeType() + "  " + entry.getOldPath() + "  " + entry.getNewPath());
             }
+
+          //  System.out.println("Target Index: " + goal_index);
+          //  System.out.println("The first id: " + allCommitIDs.get(0).getName() + "  Expected outcome: " + lastCommitId.getName());
         }
 
         FileUtils.deleteDirectory(localPath);
