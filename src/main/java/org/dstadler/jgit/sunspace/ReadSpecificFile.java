@@ -56,12 +56,12 @@ public class ReadSpecificFile {
                     revWalk.markStart(revWalk.parseCommit(ref.getObjectId()));
                 }
                 for(RevCommit commit: revWalk){
-                    if(lastCommitId == commit.getId()){
+                    if(lastCommitId.equals(commit.getId())){
                         goal_index = counter;
                         System.out.println("Target Index: " + goal_index);
                         System.out.println("The first id: " + allCommitIDs.get(0).getName() + "  Expected outcome: " + lastCommitId.getName());
                     }
-                    System.out.println("Fuck!");
+                   // System.out.println("Fuck!");
                     allCommitIDs.add(commit.getId());
                     counter++;
                 }
@@ -87,6 +87,7 @@ public class ReadSpecificFile {
                 System.out.println(entry.getChangeType() + "  " + entry.getOldPath() + "  " + entry.getNewPath());
             }
 
+            System.out.println("Counter: " + counter);
           //  System.out.println("Target Index: " + goal_index);
           //  System.out.println("The first id: " + allCommitIDs.get(0).getName() + "  Expected outcome: " + lastCommitId.getName());
         }
