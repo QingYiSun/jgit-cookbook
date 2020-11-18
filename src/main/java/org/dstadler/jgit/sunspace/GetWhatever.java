@@ -18,8 +18,7 @@ import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,12 +31,17 @@ public class GetWhatever {
     private static final String path_head = "/Users/abnerallen/IdeaProjects/SunGit/jgit-cookbook/src/test";
     private static final String path_rear = "/gemfire";
 
+    private static final String SPLIT_SYM = "#########################";
+
     public static void main(String[] args) throws IOException, GitAPIException{
 
         File newDir = new File(path_head + path_rear);
         newDir.mkdirs();
         File localPath = new File(path_head + path_rear);
         localPath.createNewFile();
+
+        OutputStream os = new FileOutputStream("/Users/abnerallen/Desktop/gemfire.txt");
+        PrintWriter pw = new PrintWriter(os);
 
         try(Git git = Git.cloneRepository()
             .setURI(REMOTE_URL)
@@ -81,50 +85,55 @@ public class GetWhatever {
                 ObjectId newTree = git.getRepository().resolve(allCommitIDs.get(i - 1).getName() + "^{tree}");
                 newTreeIter.reset(reader, newTree);
 
+                // write id and msg into files
+                String currentId = allCommitIDs.get(i - 1).getName();
+                String currentMSG = allCommits.get(i - 1).getFullMessage();
+                pw.println(currentId);
+                pw.println(currentMSG);
+
                 // show changed files between commits: oldCommit(i), newCommit(i - 1)[current]
                 final List<DiffEntry> diffs = git.diff()
                         .setOldTree(prepareTreeParser(git.getRepository(), allCommitIDs.get(i).getName()))
                         .setNewTree(prepareTreeParser(git.getRepository(), allCommitIDs.get(i - 1).getName()))
                         .call();
-                /*
-                //TODO: write all the diff info into files
+                // write all the diff info into files
                 for(DiffEntry diff: diffs){
-                    System.out.println("Diff: " + diff.getChangeType() + ": " +
-                            (diff.getOldPath().equals(diff.getNewPath()) ? diff.getNewPath() : diff.getOldPath() + " -> " + diff.getNewPath())
-                    );
+                    pw.println("Diff: " + diff.getChangeType() + ": " +
+                                    (diff.getOldPath().equals(diff.getNewPath()) ? diff.getNewPath() : diff.getOldPath() + " -> " + diff.getNewPath())
+                            );
                 }
-                */
                 DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
                 diffFormatter.setRepository(git.getRepository());
                 List<DiffEntry> entries = diffFormatter.scan(oldTreeIter, newTreeIter);
 
                 for(DiffEntry entry: entries){
-//                    System.out.println(entry.getChangeType() + "  " + entry.getOldPath() + "  " + entry.getNewPath());
-                    System.out.print(entry.getChangeType() + "  ");
-                    //TODO: fulfill ADD and DELETE
                     if(entry.getChangeType().equals(DiffEntry.ChangeType.MODIFY)) {
+                        pw.println("^MODIFY$: ");
                         String tmpNew = readFile(git.getRepository(), allCommits.get(i - 1), entry.getNewPath());
-                        System.out.print("new: " + tmpNew + "  ");
                         String tmpOld = readFile(git.getRepository(), allCommits.get(i), entry.getOldPath());
-                        System.out.println("old: " + tmpOld);
+                        pw.println(tmpOld);
+                        pw.println(tmpNew);
                     }
                     else if(entry.getChangeType().equals(DiffEntry.ChangeType.ADD)){
                         String tmpNew = readFile(git.getRepository(), allCommits.get(i - 1), entry.getNewPath());
-                        System.out.print("new: " + tmpNew + "  ");
-                        String tmpOld = "/dev/null";
-                        System.out.println("old: " + tmpOld);
+                        pw.println("^ADD$: ");
+                        pw.println(tmpNew);
                     }
                     else if(entry.getChangeType().equals(DiffEntry.ChangeType.DELETE)){
-                        String tmpNew = "/dev/null";
-                        System.out.print("new: " + tmpNew + "  ");
                         String tmpOld = readFile(git.getRepository(), allCommits.get(i), entry.getOldPath());
-                        System.out.println("old: " + tmpOld);
+                        pw.println("^DELETE$: ");
+                        pw.println(tmpOld);
                     }
                 }
+
+                pw.println(SPLIT_SYM);
 
             }
 
         }
+
+        pw.close();
+        os.close();
 
         FileUtils.deleteDirectory(localPath);
 
