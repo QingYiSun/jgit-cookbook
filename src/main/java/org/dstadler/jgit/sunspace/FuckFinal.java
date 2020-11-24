@@ -63,14 +63,15 @@ public class FuckFinal {
             }
 
             for(int i = allCommits.size() - 1; i >= 1; i--){
-                os.write(SPLIT_ID.getBytes("UTF-8"));
-                os.write(NewLine.getBytes("UTF-8"));
-                os.write(allCommits.get(i - 1).getId().getName().getBytes("UTF-8"));
-                os.write(NewLine.getBytes("UTF-8"));
-                os.write(SPLIT_MSG.getBytes("UTF-8"));
-                os.write(NewLine.getBytes("UTF-8"));
-                os.write(allCommits.get(i - 1).getFullMessage().getBytes("UTF-8"));
-                os.write(NewLine.getBytes("UTF-8"));
+                boolean isIDWritten = false, isJavaFound = false;
+            //    os.write(SPLIT_ID.getBytes("UTF-8"));
+            //    os.write(NewLine.getBytes("UTF-8"));
+            //    os.write(allCommits.get(i - 1).getId().getName().getBytes("UTF-8"));
+            //    os.write(NewLine.getBytes("UTF-8"));
+            //    os.write(SPLIT_MSG.getBytes("UTF-8"));
+            //    os.write(NewLine.getBytes("UTF-8"));
+            //    os.write(allCommits.get(i - 1).getFullMessage().getBytes("UTF-8"));
+            //    os.write(NewLine.getBytes("UTF-8"));
 
                 ObjectReader reader = git.getRepository().newObjectReader();
                 CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
@@ -90,16 +91,30 @@ public class FuckFinal {
                         continue;
                     }
                     if(diff.getOldPath().endsWith(".java") || diff.getNewPath().endsWith(".java")){
+                        if(!isJavaFound){
+                            isJavaFound = true;
+                        }
+                        if(isJavaFound && !isIDWritten){
+                            os.write(SPLIT_ID.getBytes("UTF-8"));
+                            os.write(NewLine.getBytes("UTF-8"));
+                            os.write(allCommits.get(i - 1).getId().getName().getBytes("UTF-8"));
+                            os.write(NewLine.getBytes("UTF-8"));
+                            os.write(SPLIT_MSG.getBytes("UTF-8"));
+                            os.write(NewLine.getBytes("UTF-8"));
+                            os.write(allCommits.get(i - 1).getFullMessage().getBytes("UTF-8"));
+                            os.write(NewLine.getBytes("UTF-8"));
+                            isIDWritten = true;
+                        }
                         os.write(SPLIT_OP.getBytes("UTF-8"));
                         os.write(NewLine.getBytes("UTF-8"));
                         os.write(diff.getChangeType().toString().getBytes("UTF-8"));
                         os.write(NewLine.getBytes("UTF-8"));
                         os.write(SPLIT_PATH.getBytes("UTF-8"));
                         os.write(NewLine.getBytes("UTF-8"));
-                        os.write(diff.getOldPath().getBytes("UTF-8"));
-                        os.write(NewLine.getBytes("UTF-8"));
-                        os.write(diff.getNewPath().getBytes("UTF-8"));
-                        os.write(NewLine.getBytes("UTF-8"));
+                    //    os.write(diff.getOldPath().getBytes("UTF-8"));
+                    //    os.write(NewLine.getBytes("UTF-8"));
+                    //    os.write(diff.getNewPath().getBytes("UTF-8"));
+                    //    os.write(NewLine.getBytes("UTF-8"));
                         try(DiffFormatter formatter = new DiffFormatter(os)){
                             formatter.setRepository(git.getRepository());
                             formatter.format(diff);
